@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator BMI Localhost</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 320px; }
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        .result { margin-top: 20px; padding: 12px; background: #e9ecef; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Kalkulator BMI</h2>
+        <form id="bmiForm">
+            <div class="form-group">
+                <label for="berat">Berat Badan (kg):</label>
+                <input type="number" step="any" id="berat" required placeholder="Contoh: 65">
+            </div>
+            <div class="form-group">
+                <label for="tinggi">Tinggi Badan (cm):</label>
+                <input type="number" step="any" id="tinggi" required placeholder="Contoh: 170">
+            </div>
+            <button type="submit">Hitung</button>
+        </form>
+
+        <div id="result" class="result">
+            <p><strong>BMI:</strong> <span id="bmiVal"></span></p>
+            <p><strong>Kategori:</strong> <span id="kategoriVal"></span></p>
+            <p><strong>Rentang Ideal:</strong> <span id="idealVal"></span> kg</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('bmiForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const berat = document.getElementById('berat').value;
+            const tinggi = document.getElementById('tinggi').value;
+
+            const response = await fetch('/hitung-bmi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ berat, tinggi })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                document.getElementById('bmiVal').innerText = data.bmi;
+                document.getElementById('kategoriVal').innerText = data.kategori;
+                document.getElementById('idealVal').innerText = `${data.idealMin} - ${data.idealMax}`;
+                document.getElementById('result').style.display = 'block';
+            } else {
+                alert(data.error);
+            }
+        });
+    </script>
+</body>
+</html>
